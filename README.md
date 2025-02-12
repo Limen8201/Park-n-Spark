@@ -3,7 +3,9 @@ This project aims to alleviate the persistent problem of parking space shortages
 
 # USAGE
 ● Allows users to reserve parking spaces in advance.
+
 ● Assigns walk-in drivers to available spaces automatically.
+
 ● Implements a general payment system that monitors parking duration and calculates fees.
 
 # LICENSE
