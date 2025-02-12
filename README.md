@@ -6,6 +6,13 @@ This project aims to alleviate the persistent problem of parking space shortages
 - Assigns walk-in drivers to available spaces automatically.
 - Implements a general payment system that monitors parking duration and calculates fees.
 
+## Features
+- **Parking Space Information**: Details of available parking spaces, including location, capacity, pricing, and real-time status (occupied/vacant). 
+- **User Data**: Profiles, vehicle details (plate numbers, vehicle type), reservation history, and payment details. 
+- **Transaction Data**: Payment records, parking duration tracking, and billing history. 
+- **Location Data**: GPS-based tracking to provide navigation and optimize parking space suggestions. 
+- **Feedback & Reviews**: User reviews and ratings to improve service quality and user experience. 
+
 ## Contributing
 Contributions are welcome! Please follow these steps:
 
