@@ -1,5 +1,5 @@
 # Park-n-Spark
 Project
 
-#LICENSE
+# LICENSE
 This project is licensed under the MIT License.
