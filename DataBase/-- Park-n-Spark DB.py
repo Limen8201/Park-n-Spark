@@ -6,7 +6,6 @@ cursor = conn.cursor()
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS userInfo(
         userID INTEGER PRIMARY KEY AUTOINCREMENT,
-        UID INTEGER NOT NULL,
         firstName TEXT NOT NULL,
         lastName TEXT NOT NULL,
         emailAddress TEXT NOT NULL,
