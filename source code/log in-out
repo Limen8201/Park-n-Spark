@@ -1,0 +1,68 @@
+def main():
+    print("***************************************")
+    print("*  Welcome to the Park and Spark *")
+    print("***************************************")
+    print("1. Register")
+    print("2. Login")
+    print("3. Login as Guest")
+    print("4. Logout")
+    print("5. Exit")
+    print("***************************************")
+
+    users = {}
+    logged_in_user = None
+
+    while True:
+        try:
+            choice = int(input("Enter your choice: "))
+
+            if choice == 1:
+                username = input("Enter a username: ")
+                if username in users:
+                    print("Username already exists.  Try again.")
+                    continue
+                password = input("Enter a password: ")
+                users[username] = password
+                print("Registration successful! You're in... or something.")
+
+            elif choice == 2:
+                if logged_in_user:
+                    print(f"You're already logged in as {logged_in_user}. log out first.")
+                    continue
+                username = input("Enter your username: ")
+                password = input("Enter your password: ")
+                if username in users and users[username] == password:
+                    print("Login successful!")
+                    logged_in_user = username
+                else:
+                    print("Incorrect username or password.  LMAO try again.")
+
+            elif choice == 3:
+                print("Welcome, Guest!  Enjoy your limited access.")
+                logged_in_user = "Guest"
+
+            elif choice == 4:
+                if logged_in_user:
+                    if logged_in_user == "Guest":
+                        print("Guest user logged out.")
+                    else:
+                        print(f"{logged_in_user} logged out.  See ya!")
+                    logged_in_user = None
+                else:
+                    print("You're not logged in, dude.")
+
+            elif choice == 5:
+                print("Exiting...")
+                break
+
+            else:
+                print("Invalid choice.")
+
+        except ValueError:
+            print("Invalid input. Numbers only, please.")
+        except Exception as e:
+            print(f"Whoops, something went wrong: {e}")
+
+
+if __name__ == "__main__":
+    main()
