@@ -26,11 +26,13 @@ Contributions are welcome! Please follow these steps:
 This project is licensed under the [MIT License](LICENSE).
 
 ## Acknowledgment
- Thank you to the developers and contributors who have made this project possible:
+In Partial Fulfillment of the Requirements for the subject Software Design (CPE106-4) BS Computer Engineering Mapua University
+
+Thank you to the developers and contributors who have made this project possible:
 - Bejo, John Michael S.
 - David, Ethan Raphael R. 
 - Dizon,Eruel Joseph D. 
 - Miranda, Jan Joel Q.
 
-and to our mentor
+and to our mentor and professor
 - Dr. Jonathan V. Taylar 
