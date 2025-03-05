@@ -16,7 +16,25 @@ class ParkingApp(QWidget):
 
     def __widgetInit__(self):
         self.layout = QVBoxLayout()
+        self.label = QLabel("Welcome to Park & Spark")
+        self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        self.layout.addWidget(self.label)
 
+        self.signup_button = QPushButton("Sign Up")
+        self.signup_button.clicked.connect(self.show_signup_page)
+        self.layout.addWidget(self.signup_button)
+
+        self.signin_button = QPushButton("Sign In")
+        self.signin_button.clicked.connect(self.show_signin_page)
+        self.layout.addWidget(self.signin_button)
+
+        self.guest_button = QPushButton("Log in as Guest")
+        self.layout.addWidget(self.guest_button)
+
+        self.setLayout(self.layout)
+
+    def __widgetInit2__(self): #Created second init for back button
+        self.clear_layout()
         self.label = QLabel("Welcome to Park & Spark")
         self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.layout.addWidget(self.label)
@@ -71,7 +89,7 @@ class ParkingApp(QWidget):
         self.layout.addWidget(self.register_button)
 
         self.back_button = QPushButton("Back")
-        self.back_button.clicked.connect(self.__widgetInit__)
+        self.back_button.clicked.connect(self.__widgetInit2__)
         self.layout.addWidget(self.back_button)
 
         self.setLayout(self.layout)
@@ -115,20 +133,21 @@ class ParkingApp(QWidget):
         self.layout.addWidget(self.login_button)
 
         self.back_button = QPushButton("Back")
-        self.back_button.clicked.connect(self.__widgetInit__)
+        self.back_button.clicked.connect(self.__widgetInit2__)
         self.layout.addWidget(self.back_button)
 
         self.setLayout(self.layout)
 
     def validate_login(self):
+        cursor.execute('SELECT * FROM userInfo WHERE emailAddress = ? AND password = ?', (self.email.text(), self.password.text()))
         if not self.email.text() or not self.password.text():
             QMessageBox.warning(self, "Error", "All fields must be filled!")
-
-        cursor.execute('SELECT * FROM userInfo WHERE emailAddress = ? AND password = ?', (self.email.text(), self.password.text()))
-        if not cursor.fetchone():  # An empty result evaluates to False.
+            print("Login failed")
+        elif not cursor.fetchone():  # An empty result evaluates to False.
+            QMessageBox.information(self, "Login Failed", "Invalid email or password")
             print("Login failed")
         else:
-            print("Welcome")
+            print("Login successful")
             self.show_parking_dashboard(self.email.text())
         
 
@@ -136,12 +155,12 @@ class ParkingApp(QWidget):
         self.clear_layout()
         cursor.execute('SELECT * FROM userInfo WHERE emailAddress = ?', (email,))
         user = cursor.fetchone()
-        first, last = user[2], user[3] # Get firstName and lastName from DB; number is column
+        first, last = user[2], user[3] # Get firstName and lastName; column in database
         self.label = QLabel(f"Welcome {first} {last}")
         self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.layout.addWidget(self.label)
 
-        model, type = user[6], user[5] # Get vehicleModel and vehicleType from DB; number is column
+        model, type = user[6], user[5] # Get Model and Type; column in database
         self.car_info = QLabel(f"Car Model: {model}, Car Type: {type}")
         self.layout.addWidget(self.car_info)
 
