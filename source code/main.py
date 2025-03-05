@@ -1,4 +1,9 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QLineEdit
+import sqlite3
+from user import User
+
+conn = sqlite3.connect("Park-n-Spark\DataBase\Park-n-Spark.db")
+cursor = conn.cursor()
 
 class ParkingApp(QWidget):
     def __init__(self):
@@ -75,13 +80,14 @@ class ParkingApp(QWidget):
         if not self.first_name.text() or not self.last_name.text() or not self.email.text() or not self.password.text() or not self.car_type.text() or not self.car_model.text():
             QMessageBox.warning(self, "Error", "All fields must be filled!")
         else:
-            self.user_data[self.email.text()] = {
-                "first_name": self.first_name.text(),
-                "last_name": self.last_name.text(),
-                "password": self.password.text(),
-                "car_type": self.car_type.text(),
-                "car_model": self.car_model.text()
-            }
+            self.user_data = User(self.password.text(),
+                                self.first_name.text(),
+                                self.last_name.text(),
+                                self.car_type.text(),
+                                self.car_model.text(),
+                                self.email.text())
+            
+            self.user_data.register()
             self.show_registration_success()
 
     def show_registration_success(self):
@@ -115,25 +121,28 @@ class ParkingApp(QWidget):
         self.setLayout(self.layout)
 
     def validate_login(self):
-        email = self.email.text()
-        password = self.password.text()
-
-        if not email or not password:
+        if not self.email.text() or not self.password.text():
             QMessageBox.warning(self, "Error", "All fields must be filled!")
-        elif email in self.user_data and self.user_data[email]["password"] == password:
-            self.show_parking_dashboard(email)
+
+        cursor.execute('SELECT * FROM userInfo WHERE emailAddress = ? AND password = ?', (self.email.text(), self.password.text()))
+        if not cursor.fetchone():  # An empty result evaluates to False.
+            print("Login failed")
         else:
-            QMessageBox.warning(self, "Error", "Invalid credentials!")
+            print("Welcome")
+            self.show_parking_dashboard(self.email.text())
+        
 
     def show_parking_dashboard(self, email):
         self.clear_layout()
-
-        user = self.user_data[email]
-        self.label = QLabel(f"Welcome, {user['first_name']} {user['last_name']}!")
+        cursor.execute('SELECT * FROM userInfo WHERE emailAddress = ?', (email,))
+        user = cursor.fetchone()
+        first, last = user[2], user[3] # Get firstName and lastName from DB; number is column
+        self.label = QLabel(f"Welcome {first} {last}")
         self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.layout.addWidget(self.label)
 
-        self.car_info = QLabel(f"Car Model: {user['car_model']}, Car Type: {user['car_type']}")
+        model, type = user[6], user[5] # Get vehicleModel and vehicleType from DB; number is column
+        self.car_info = QLabel(f"Car Model: {model}, Car Type: {type}")
         self.layout.addWidget(self.car_info)
 
         self.vacancy_button = QPushButton("View Number of Vacancy")
