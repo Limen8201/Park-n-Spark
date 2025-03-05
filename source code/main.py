@@ -10,30 +10,11 @@ class ParkingApp(QWidget):
         super().__init__()
         self.setWindowTitle("Park & Spark - Parking System")
         self.setGeometry(100, 100, 1000, 1000)  # Increased window size further
-
+        self.layout = QVBoxLayout()
         self.user_data = {}  # Dictionary to store user info
         self.__widgetInit__()
 
     def __widgetInit__(self):
-        self.layout = QVBoxLayout()
-        self.label = QLabel("Welcome to Park & Spark")
-        self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
-        self.layout.addWidget(self.label)
-
-        self.signup_button = QPushButton("Sign Up")
-        self.signup_button.clicked.connect(self.show_signup_page)
-        self.layout.addWidget(self.signup_button)
-
-        self.signin_button = QPushButton("Sign In")
-        self.signin_button.clicked.connect(self.show_signin_page)
-        self.layout.addWidget(self.signin_button)
-
-        self.guest_button = QPushButton("Log in as Guest")
-        self.layout.addWidget(self.guest_button)
-
-        self.setLayout(self.layout)
-
-    def __widgetInit2__(self): #Created second init for back button
         self.clear_layout()
         self.label = QLabel("Welcome to Park & Spark")
         self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -89,7 +70,7 @@ class ParkingApp(QWidget):
         self.layout.addWidget(self.register_button)
 
         self.back_button = QPushButton("Back")
-        self.back_button.clicked.connect(self.__widgetInit2__)
+        self.back_button.clicked.connect(self.__widgetInit__)
         self.layout.addWidget(self.back_button)
 
         self.setLayout(self.layout)
@@ -133,7 +114,7 @@ class ParkingApp(QWidget):
         self.layout.addWidget(self.login_button)
 
         self.back_button = QPushButton("Back")
-        self.back_button.clicked.connect(self.__widgetInit2__)
+        self.back_button.clicked.connect(self.__widgetInit__)
         self.layout.addWidget(self.back_button)
 
         self.setLayout(self.layout)
@@ -188,7 +169,23 @@ class ParkingApp(QWidget):
         self.history_button = QPushButton("View History")
         self.layout.addWidget(self.history_button)
 
+        self.logout_button = QPushButton("Log Out")
+        self.layout.addWidget(self.logout_button)
+        self.logout_button.clicked.connect(self.logout)
+
         self.setLayout(self.layout)
+
+    def logout(self):
+        self.label = QLabel("Are you sure you want to log out?")
+        self.layout.addWidget(self.label)
+
+        self.yes_button = QPushButton("Yes")
+        self.layout.addWidget(self.yes_button)
+        self.yes_button.clicked.connect(self.__widgetInit__)
+
+        self.no_button = QPushButton("No")
+        self.layout.addWidget(self.no_button)
+        self.no_button.clicked.connect(self.show_parking_dashboard)
 
     def clear_layout(self):
         while self.layout.count():
