@@ -1,17 +1,20 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QLineEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox, QLineEdit, QDialog, QInputDialog
 import sqlite3
 from user import User
+from PyQt5.QtGui import QPixmap
 
-conn = sqlite3.connect("Park-n-Spark\DataBase\Park-n-Spark.db")
+conn = sqlite3.connect(r"C:/Users/ethan/Downloads/Park-n-Spark/DataBase/Park-n-Spark.db")
 cursor = conn.cursor()
 
 class ParkingApp(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Park & Spark - Parking System")
-        self.setGeometry(100, 100, 1000, 1000)  # Increased window size further
+        self.setGeometry(100, 100, 1000, 1000)  #
         self.layout = QVBoxLayout()
-        self.user_data = {}  # Dictionary to store user info
+        self.user_data = {}
+        self.total_hours = 0
+        self.payment_mode = None
         self.__widgetInit__()
 
     def __widgetInit__(self):
@@ -137,27 +140,27 @@ class ParkingApp(QWidget):
         cursor.execute('SELECT * FROM userInfo WHERE emailAddress = ?', (email,))
         user = cursor.fetchone()
         first, last = user[2], user[3] # Get firstName and lastName; column in database
-        self.label = QLabel(f"Welcome {first} {last}")
+        self.label = QLabel(f"Welcome, {first} {last}!")
         self.label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.layout.addWidget(self.label)
 
         model, type = user[6], user[5] # Get Model and Type; column in database
-        self.car_info = QLabel(f"Car Model: {model}, Car Type: {type}")
+        self.car_info = QLabel(f"Car Model: {model}\nCar Type: {type}")
         self.layout.addWidget(self.car_info)
 
         self.vacancy_button = QPushButton("View Number of Vacancy")
         self.layout.addWidget(self.vacancy_button)
 
         self.pay_button = QPushButton("Pay")
+        self.pay_button.clicked.connect(self.show_payment_window)
         self.layout.addWidget(self.pay_button)
 
-        self.print_receipt_button = QPushButton("Print Receipt")
-        self.layout.addWidget(self.print_receipt_button)
-
-        self.find_parking_spot_button = QPushButton("Find Parking Spot")
-        self.layout.addWidget(self.find_parking_spot_button)
+        self.find_parking_button = QPushButton("Find Parking Spot")
+        self.find_parking_button.clicked.connect(self.find_parking_spot)
+        self.layout.addWidget(self.find_parking_button)
 
         self.cancel_button = QPushButton("Cancellation")
+        self.cancel_button.clicked.connect(self.cancel_parking)
         self.layout.addWidget(self.cancel_button)
 
         self.reserve_button = QPushButton("Reservation")
@@ -174,6 +177,113 @@ class ParkingApp(QWidget):
         self.logout_button.clicked.connect(self.logout)
 
         self.setLayout(self.layout)
+
+    def cancel_parking(self):
+        if self.total_hours == 0:
+            QMessageBox.warning(self, "Error", "You should find a parking spot first!")
+        else:
+            self.total_hours = 0  
+            self.payment_mode = None  
+            QMessageBox.information(self, "Success", "Successfully cancelled parking!")
+
+    def find_parking_spot(self):
+        if self.total_hours > 0:
+            reply = QMessageBox.question(self, "Add More Hours", "Do you want to add more parking hours?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if reply == QMessageBox.No:
+                return
+            
+        hours, ok = QInputDialog.getInt(self, "Find Parking Spot", "Enter hours to park:")
+        if ok and hours > 0:
+            self.total_hours += hours
+            QMessageBox.information(self, "Success", f"Successfully added {hours} hours to your current parking. Total hours: {self.total_hours}.")
+        else:
+            QMessageBox.warning(self, "Error", "Invalid number of hours!")
+
+
+    def show_payment_window(self):
+        if self.total_hours == 0:
+            QMessageBox.warning(self, "Error", "Please find a parking spot first!")
+            return
+        
+        self.payment_window = QWidget()
+        self.payment_window.setWindowTitle("Payment")
+        self.payment_layout = QVBoxLayout()
+
+        rate = 20  # Pesos per hour
+        self.total_amount = self.total_hours * rate
+
+        self.payment_label = QLabel(f"Total Hours Parked: {self.total_hours} hours")
+        self.rate_label = QLabel(f"Rate: {rate} pesos per hour")
+        self.total_amount_label = QLabel(f"Total Amount: {self.total_amount} pesos")
+
+        self.payment_layout.addWidget(self.payment_label)
+        self.payment_layout.addWidget(self.rate_label)
+        self.payment_layout.addWidget(self.total_amount_label)
+
+        self.gcash_button = QPushButton("Pay with GCash")
+        self.gcash_button.clicked.connect(lambda: self.select_payment_mode("GCash"))
+        self.payment_layout.addWidget(self.gcash_button)
+
+        self.cash_button = QPushButton("Pay with Cash")
+        self.cash_button.clicked.connect(lambda: self.select_payment_mode("Cash"))
+        self.payment_layout.addWidget(self.cash_button)
+
+        self.payment_window.setLayout(self.payment_layout)
+        self.payment_window.show()
+    
+    def select_payment_mode(self, mode):
+        if self.payment_mode:
+            QMessageBox.warning(self, "Error", "You can only choose one payment method!")
+            return
+        
+        self.payment_mode = mode
+        if mode == "GCash":
+            self.show_gcash_payment()
+        elif mode == "Cash":
+            self.show_cash_payment()
+
+    def show_gcash_payment(self):
+        self.gcash_window = QWidget()
+        self.gcash_window.setWindowTitle("GCash Payment")
+        self.gcash_layout = QVBoxLayout()
+
+        self.gcash_label = QLabel("Scan the QR code to pay via GCash")
+        self.gcash_qr = QLabel()
+        pixmap = QPixmap(r"C:\Users\ethan\Downloads\Park-n-Spark\GCASH\gcash.png")
+        pixmap = pixmap.scaled(500, 800)
+        self.gcash_qr.setPixmap(pixmap)
+
+        self.gcash_layout.addWidget(self.gcash_label)
+        self.gcash_layout.addWidget(self.gcash_qr)
+
+        self.confirm_payment_button = QPushButton("Mark as Paid")
+        self.confirm_payment_button.clicked.connect(self.confirm_payment)
+        self.gcash_layout.addWidget(self.confirm_payment_button)
+
+        self.gcash_window.setLayout(self.gcash_layout)
+        self.gcash_window.show()
+ 
+    def show_cash_payment(self):
+        cash_given, ok = QInputDialog.getDouble(self, "Cash Payment", "Enter cash amount:")
+        if not ok:
+            return  # Cancelled input
+
+        if cash_given >= self.total_amount:
+            change = cash_given - self.total_amount
+            QMessageBox.information(self, "Change", f"Your change: {change} pesos")
+            self.confirm_payment()
+        else:
+            QMessageBox.warning(self, "Error", "Insufficient amount!")
+
+    def confirm_payment(self):
+        self.total_hours = 0  # Clear parking hours after successful payment
+        self.payment_mode = None
+        QMessageBox.information(self, "Success", "Payment successfully received!")
+        self.payment_window.close()
+        if hasattr(self, 'gcash_window'):
+            self.gcash_window.close()
+        if hasattr(self, 'cash_window'):
+            self.payment_window.close()
 
     def logout(self):
         self.label = QLabel("Are you sure you want to log out?")
