@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ParkingApp</class>
+ <widget class="QWidget" name="ParkingApp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>1000</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Park &amp; Spark - Parking System</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Welcome to Park &amp; Spark</string>
+     </property>
+     <property name="styleSheet">
+      <string>font-size: 16px; font-weight: bold;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="signup_button">
+     <property name="text">
+      <string>Sign Up</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="signin_button">
+     <property name="text">
+      <string>Sign In</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="guest_button">
+     <property name="text">
+      <string>Log in as Guest</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
